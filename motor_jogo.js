@@ -1,4 +1,4 @@
-			var CANVAS_WIDTH = 800;
+var CANVAS_WIDTH = 800;
 			var CANVAS_HEIGHT = 320;
 			var canvas;
 			var canvasPlacar;
@@ -25,15 +25,14 @@
             var botaoStart;
             var mesaStart;
             var modoEasy = true;
-            var mouseY;
-            var mouseX;
 
-            
 
 			function inicializaJogo()
 			{
-				canvas = document.getElementById("meuCanvas").getContext("2d");
-				canvasPlacar = document.getElementById("Placar").getContext("2d");
+				canvas = document.getElementById("meuCanvas")
+					.getContext("2d");
+				canvasPlacar = document.getElementById("Placar")
+					.getContext("2d");
 				criaObjetosJogo();					
 				setInterval("loopJogo()", 1000/FPS);
 			}
@@ -46,24 +45,9 @@
 			
 			function update()
 			{
-				$(document).ready(function(){						   
-					    $("html").mousemove(	function(p){
-					    	mouseY = p.clientY;
-			           		mouseX = p.clientX;
-							$("div.janela").text("Posição: X="+mouseX+" Y="+mouseY);
-						})
-					});
-
 				if(estadoJogo == true)
 				{
-					if(mouseY - player.midpoint < 0)
-						player.y = 0;
-					else if(mouseY - player.midpoint > CANVAS_HEIGHT - player.height)
-						player.y = (CANVAS_HEIGHT - player.height);
-					else
-						player.y = mouseY - player.midpoint;
-
-					/*if (keydown.up && player.y >= 2)
+					if (keydown.up && player.y >= 2)
 					{
 						playerCima = true;
 						player.y -= 10;
@@ -73,7 +57,6 @@
 						playerCima = false;
 						player.y += 10;
 					}
-					*/
 					
 					if(modoEasy == true)
 					{
@@ -198,14 +181,19 @@
 				if (estadoJogo == false && (playerPT == 5 || enemiePT == 5)){
 					desenhaTextoGO()
 				}
-				else if(estadoJogo){
-					player.draw();
-					bola.draw();
-					enemie.draw();
-					Placar.draw();
-					desenhaPlacar();
+				else{
+					if(estadoJogo == false)
+					{
+						
+					}
+					else {
+						player.draw();
+						bola.draw();
+						enemie.draw();
+						Placar.draw();
+						desenhaPlacar();
+					}
 				}
-				
 			}
 			
 			function limpaTela()
@@ -256,7 +244,6 @@
 					width: 30,
 					height: 90,
 					sprite: Sprite("jogador1"),
-					midpoint: (90 / 2),
 					draw: function()
 					{
 						this.sprite.draw(canvas, this.x, this.y);
