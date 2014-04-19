@@ -17,23 +17,14 @@
 				margin-bottom: 0px;
 				background-color: #dbb59c;
 			}
-			
-			#invisivel{
-			visibility:visible;
-			width:800px;
-			height:320px;
-			position: absolute;
-			}
-			
 		</style>
 	</head>
-	<body onload="inicializaJogo()">
-	<center>
-		<img onmouseover='bigImg(this, 130, 130)' onmouseout='normalImg(this, 123, 123)' onmousedown='rodarJogo()' border='0' src='images/botaoStart.png' alt='botaoStart' width='123' height='123'></br>
+	<body onload="inicializaJogo()" onmousedown='botao()'>
  		<canvas width="800" height="320" id="meuCanvas">
 		</canvas></br>
 		<canvas width="338" height="158" id="Placar">
-		</canvas>
-	</center>
+		</canvas></br>
+		<div class="janela">
+		</div>
 	</body>
 </html>

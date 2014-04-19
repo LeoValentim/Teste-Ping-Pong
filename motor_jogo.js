@@ -1,4 +1,4 @@
-var CANVAS_WIDTH = 800;
+			var CANVAS_WIDTH = 800;
 			var CANVAS_HEIGHT = 320;
 			var canvas;
 			var canvasPlacar;
@@ -21,18 +21,19 @@ var CANVAS_WIDTH = 800;
             var enemieVelo = 25;
             var bolaVelo = 10;
             var modoHard = false;
-            var estadoJogo = false;
+            var jogoRodando = false;
             var botaoStart;
             var mesaStart;
             var modoEasy = true;
+            var mouseY;
+            var mouseX;
 
+            
 
 			function inicializaJogo()
 			{
-				canvas = document.getElementById("meuCanvas")
-					.getContext("2d");
-				canvasPlacar = document.getElementById("Placar")
-					.getContext("2d");
+				canvas = document.getElementById("meuCanvas").getContext("2d");
+				canvasPlacar = document.getElementById("Placar").getContext("2d");
 				criaObjetosJogo();					
 				setInterval("loopJogo()", 1000/FPS);
 			}
@@ -45,9 +46,24 @@ var CANVAS_WIDTH = 800;
 			
 			function update()
 			{
-				if(estadoJogo == true)
+				$(document).ready(function(){						   
+					    $("html").mousemove(	function(p){
+					    	mouseY = p.clientY;
+			           		mouseX = p.clientX;
+							$("div.janela").text("Posição: X="+mouseX+" Y="+mouseY);
+						})
+					});
+
+				if(jogoRodando == true)
 				{
-					if (keydown.up && player.y >= 2)
+					if(mouseY - player.midpoint < 0)
+						player.y = 0;
+					else if(mouseY - player.midpoint > CANVAS_HEIGHT - player.height)
+						player.y = (CANVAS_HEIGHT - player.height);
+					else
+						player.y = mouseY - player.midpoint;
+
+					/*if (keydown.up && player.y >= 2)
 					{
 						playerCima = true;
 						player.y -= 10;
@@ -57,6 +73,7 @@ var CANVAS_WIDTH = 800;
 						playerCima = false;
 						player.y += 10;
 					}
+					*/
 					
 					if(modoEasy == true)
 					{
@@ -83,39 +100,33 @@ var CANVAS_WIDTH = 800;
 					}
 					if (bolaTempo <= 0) 
 					{
-	                    if ((bola.x) <= (player.x + player.width)) 
+	                    if (contains(bola, player)) 
 	                    {
-	                        if ((bola.y > player.y) && (bola.y - 10 < player.y + player.height)) 
-	                        {
-	                            bolaDir = true;
-	                            Sound.play("pingpong1");
-	                            if (playerCima)
-	                            {
-	                                bolaAngulo = Math.floor(Math.random() * 10) - 9;
-	                            }
-	                            else 
-	                            {
-	                                bolaAngulo = Math.floor((Math.random() * 10));
-	                            }
-	                            bolaVelo ++;
-	                        }
+                            bolaDir = true;
+                            Sound.play("pingpong1");
+                            if (playerCima)
+                            {
+                                bolaAngulo = Math.floor(Math.random() * 10) - 9;
+                            }
+                            else 
+                            {
+                                bolaAngulo = Math.floor((Math.random() * 10));
+                            }
+                            bolaVelo ++;
 	                    }
-	                    else if ((bola.x + 10) >= (enemie.x)) 
+	                    else if (contains(bola, enemie)) 
 	                    {
-	                        if ((bola.y + 10 > enemie.y) && (bola.y - 10 < enemie.y + enemie.height)) 
-	                        {
-	                            bolaDir = false;
-	                            Sound.play("pingpong1");
-	                            if (enemieCima) 
-	                            {
-	                                bolaAngulo = Math.floor(Math.random() * 10) - 9;
-	                            }
-	                            else 
-	                            {
-	                                bolaAngulo = Math.floor((Math.random() * 10));
-	                            }
-	                            bolaVelo ++;
-	                        }
+                            bolaDir = false;
+                            Sound.play("pingpong1");
+                            if (enemieCima) 
+                            {
+                                bolaAngulo = Math.floor(Math.random() * 10) - 9;
+                            }
+                            else 
+                            {
+                                bolaAngulo = Math.floor((Math.random() * 10));
+                            }
+                            bolaVelo ++;
 	                    }
 	                    
 	                    if ((bola.y - 10 <= 0) || (bola.y + 10 > CANVAS_HEIGHT)) 
@@ -178,22 +189,20 @@ var CANVAS_WIDTH = 800;
 			{
 				limpaTela();
 				Mesa.draw();
-				if (estadoJogo == false && (playerPT == 5 || enemiePT == 5)){
-					desenhaTextoGO()
+				if (jogoRodando == false){
+					if(playerPT == 5 || enemiePT == 5)
+						desenhaTextoGO()
+					else
+					botaoStart.draw();
 				}
-				else{
-					if(estadoJogo == false)
-					{
-						
-					}
-					else {
-						player.draw();
-						bola.draw();
-						enemie.draw();
-						Placar.draw();
-						desenhaPlacar();
-					}
+				else if(jogoRodando){
+					player.draw();
+					bola.draw();
+					enemie.draw();
+					Placar.draw();
+					desenhaPlacar();
 				}
+				
 			}
 			
 			function limpaTela()
@@ -244,10 +253,15 @@ var CANVAS_WIDTH = 800;
 					width: 30,
 					height: 90,
 					sprite: Sprite("jogador1"),
+					midpoint: (90 / 2),
 					draw: function()
 					{
 						this.sprite.draw(canvas, this.x, this.y);
 					},
+					/*control: function()
+					{
+						this.
+					}*/
 				}
 				
 				bola = {
@@ -344,17 +358,53 @@ var CANVAS_WIDTH = 800;
 					}
 				}
 			}
+
+			function contains(objetoA, objetoB)
+			{
+				if(objetoA.x < objetoB.x + objetoB.width && 
+					objetoA.x + objetoA.width > objetoB.x && 
+					objetoA.y < objetoB.y + objetoB.height &&
+					objetoA.y + objetoA.height > objetoB.y)
+					return true;
+				else
+					return false;
+			}
+
+			function mouseContains(objetoA)
+			{
+				if(mouseX >= objetoA.x && 
+					mouseX <= objetoA.x + objetoA.width && 
+					mouseY >= objetoA.y && 
+					mouseY <= objetoA.y + objetoA.height)
+					return true;
+				else
+					return false;
+			}
+
+			function mouseMovimentando()
+			{
+				var temp;
+				mouse
+			}
+
+			function botao()
+			{
+				var sbotao;
+					this.sbotao = botaoStart;
+				if(mouseContains(botaoStart))
+					rodarJogo();
+			}
 			
 			function rodarJogo()
 			{
-				estadoJogo = true;
+				jogoRodando = true;
 				playerPT = 0;
 				enemiePT = 0;
 			}
 			
 			function fimdejogo()
 			{
-				estadoJogo = false;
+				jogoRodando = false;
 			}
 			
 			function bigImg(x, a, b)
