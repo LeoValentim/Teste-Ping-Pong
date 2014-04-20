@@ -27,6 +27,9 @@
             var modoEasy = true;
             var mouseY;
             var mouseX;
+            var mouseDY;
+            var currentMouseY;
+            var previusMouseY;
 
             
 
@@ -36,6 +39,7 @@
 				canvasPlacar = document.getElementById("Placar").getContext("2d");
 				criaObjetosJogo();					
 				setInterval("loopJogo()", 1000/FPS);
+				previusMouseY = mouseY;
 			}
 			
 			function loopJogo()
@@ -62,6 +66,15 @@
 						player.y = (CANVAS_HEIGHT - player.height);
 					else
 						player.y = mouseY - player.midpoint;
+
+					currentMouseY = mouseY;
+
+					if(currentMouseY < previusMouseY)
+						playerCima = true;
+					else
+						playerCima = false;
+
+					previusMouseY = currentMouseY;
 
 					/*if (keydown.up && player.y >= 2)
 					{
@@ -384,7 +397,8 @@
 			function mouseMovimentando()
 			{
 				var temp;
-				mouse
+				this.temp = mouseY;
+
 			}
 
 			function botao()
