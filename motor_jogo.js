@@ -20,18 +20,24 @@
             var enemiePT = 0;
             var enemieVelo = 25;
             var bolaVelo = 10;
-            var modoHard = false;
             var jogoRodando = false;
             var botaoStart;
-            var mesaStart;
-            var modoEasy = true;
             var mouseY;
             var mouseX;
             var mouseDY;
             var currentMouseY;
             var previusMouseY;
+            var ctrlJ;
+            var numJogadores;
 
-            
+
+
+            $(document).ready(function(){						   
+			    $("html").mousemove(	function(p){
+			    	mouseY = p.clientY;
+	           		mouseX = p.clientX;
+				});
+			});
 
 			function inicializaJogo()
 			{
@@ -47,70 +53,16 @@
 				update();
 				draw();
 			}
-			
+
 			function update()
 			{
-				$(document).ready(function(){						   
-					    $("html").mousemove(	function(p){
-					    	mouseY = p.clientY;
-			           		mouseX = p.clientX;
-							$("div.janela").text("Posição: X="+mouseX+" Y="+mouseY);
-						})
-					});
 
 				if(jogoRodando == true)
 				{
-					if(mouseY - player.midpoint < 0)
-						player.y = 0;
-					else if(mouseY - player.midpoint > CANVAS_HEIGHT - player.height)
-						player.y = (CANVAS_HEIGHT - player.height);
-					else
-						player.y = mouseY - player.midpoint;
-
-					currentMouseY = mouseY;
-
-					if(currentMouseY < previusMouseY)
-						playerCima = true;
-					else
-						playerCima = false;
-
-					previusMouseY = currentMouseY;
-
-					/*if (keydown.up && player.y >= 2)
-					{
-						playerCima = true;
-						player.y -= 10;
-					}
-					if (keydown.down && player.y <= ((CANVAS_HEIGHT - player.height) - 2))
-					{
-						playerCima = false;
-						player.y += 10;
-					}
-					*/
+					controlesJogo(ctrlJ);
 					
-					if(modoEasy == true)
-					{
-						inteligenciaEnemy();
-					}
-					else
-					{
-						if (enemieCima) 
-						{
-							enemie.y -= enemieVelo;
-							if (enemie.y <= 0) 
-							{
-								enemieCima = false;
-							}
-						}
-						else
-						{
-							enemie.y += enemieVelo;
-							if (enemie.y >= CANVAS_HEIGHT - enemie.height)
-							{
-								enemieCima = true;
-							}
-						}
-					}
+					controleEnemy();
+
 					if (bolaTempo <= 0) 
 					{
 	                    if (contains(bola, player)) 
@@ -172,15 +124,8 @@
 	                            playerPT++;
 	                            bolaDir = false;
 	                        }
-	                    	if (modoHard == true){
-	                        	bola.x = (CANVAS_WIDTH / 3) * 2;
-	                        	bolaVelo = 20;
-	                        	enemieVelo = 50;
-	                        }
-	                        else{
-	                        	bola.x = CANVAS_WIDTH / 2;
-	                        	bolaVelo = 10;
-	                        }
+                        	bola.x = CANVAS_WIDTH / 2;
+                        	bolaVelo = 10;
 	                        bola.y = CANVAS_HEIGHT / 2;
 	                        bolaAngulo = Math.floor(Math.random() * 21) - 10;
 	                        bolaTempo = 0;
@@ -205,8 +150,8 @@
 				if (jogoRodando == false){
 					if(playerPT == 5 || enemiePT == 5)
 						desenhaTextoGO()
-					else
-					botaoStart.draw();
+					//else
+					//botaoStart.draw();
 				}
 				else if(jogoRodando){
 					player.draw();
@@ -228,7 +173,7 @@
 			
 			function desenhaPlacar()
 			{
-				canvasPlacar.font = "38pt Helvetica";
+				canvasPlacar.font = "38pt Arial";
 				canvasPlacar.fillStyle = "Red";
 				if (playerPT < 10){
 					canvasPlacar.fillText("0" + playerPT, 56, 135);
@@ -246,7 +191,7 @@
 			
 			function desenhaTextoGO()
 			{
-				canvas.font = "62pt Helvetica";
+				canvas.font = "62pt Arial";
 				canvas.fillStyle = "White";
 				if(playerPT == 5){
 				canvas.fillText("VOCE GANHOU", 100, (CANVAS_HEIGHT / 3));
@@ -298,6 +243,7 @@
 					width: 30,
 					height: 90,
 					sprite: Sprite("inimigo1"),
+					midpoint: (90 / 2),
 					draw: function()
 					{
 						this.sprite.draw(canvas, this.x, this.y);
@@ -372,6 +318,94 @@
 				}
 			}
 
+			function setCtrlJ(temp)
+			{
+				ctrlJ = temp;
+				rodarJogo();
+			}
+
+			function setNumJ(tempJ)
+			{
+				numJogadores = tempJ;
+			}
+
+			function controlesJogo(ctrlJ)
+			{
+				if(ctrlJ == "KeyBoard")
+				{
+					if (keydown.up && player.y >= 2)
+					{
+						playerCima = true;
+						player.y -= 10;
+					}
+					if (keydown.down && player.y <= ((CANVAS_HEIGHT - player.height) - 2))
+					{
+						playerCima = false;
+						player.y += 10;
+					}
+				}
+				else if(ctrlJ == "Mouse")
+				{
+					if(mouseY - player.midpoint < 0)
+						player.y = 0;
+					else if(mouseY - player.midpoint > CANVAS_HEIGHT - player.height)
+						player.y = (CANVAS_HEIGHT - player.height);
+					else
+						player.y = mouseY - player.midpoint;
+
+					currentMouseY = mouseY;
+
+					if(currentMouseY < previusMouseY)
+						playerCima = true;
+					else
+						playerCima = false;
+
+					previusMouseY = currentMouseY;
+				}
+			}
+
+			function controleEnemy()
+			{
+				if(numJogadores == 2)
+				{
+					if(ctrlJ == "KeyBoard")
+					{
+						if(mouseY - enemie.midpoint < 0)
+						enemie.y = 0;
+						else if(mouseY - enemie.midpoint > CANVAS_HEIGHT - enemie.height)
+							enemie.y = (CANVAS_HEIGHT - enemie.height);
+						else
+							enemie.y = mouseY - enemie.midpoint;
+
+						currentMouseY = mouseY;
+
+						if(currentMouseY < previusMouseY)
+							enemieCima = true;
+						else
+							enemieCima = false;
+
+						previusMouseY = currentMouseY;
+					}
+					else if(ctrlJ == "Mouse")
+					{
+						if (keydown.up && enemie.y >= 2)
+						{
+							enemieCima = true;
+							enemie.y -= 10;
+						}
+						if (keydown.down && enemie.y <= ((CANVAS_HEIGHT - enemie.height) - 2))
+						{
+							enemieCima = false;
+							enemie.y += 10;
+						}
+					}
+				}
+				else
+				{
+					inteligenciaEnemy();
+				}
+			}
+
 			function contains(objetoA, objetoB)
 			{
 				if(objetoA.x < objetoB.x + objetoB.width && 
@@ -393,21 +427,6 @@
 				else
 					return false;
 			}
-
-			function mouseMovimentando()
-			{
-				var temp;
-				this.temp = mouseY;
-
-			}
-
-			function botao()
-			{
-				var sbotao;
-					this.sbotao = botaoStart;
-				if(mouseContains(botaoStart))
-					rodarJogo();
-			}
 			
 			function rodarJogo()
 			{
@@ -418,17 +437,30 @@
 			
 			function fimdejogo()
 			{
+				$(document).ready(function(){
+			    	$('.background').animate({'opacity':'0.30'}, 100, 'linear', function(){
+						$('.box').animate({'opacity':'1.0'}, 100, 'linear', function(){
+							$('.background, .box').css('display', 'block');
+						});
+					});
+				});
 				jogoRodando = false;
 			}
-			
-			function bigImg(x, a, b)
+
+			/* function winnerDraw()
 			{
-				x.style.height=a;
-				x.style.width=b;
-			}
-	
-			function normalImg(x, a, b)
-			{
-				x.style.height=a;
-				x.style.width=b;
-			}
+				if(numJogadores == 2)
+				{
+					if(playerPT == 5)
+						document.write('<h1 style="font-family: Arial,Helvetica,sans-serif; text-align: center; font-style: Regular; color: #003333;"><b>JOGADOR 1 GANHOU</b></h1>');
+					else
+						document.write('<h1 style="font-family: Arial,Helvetica,sans-serif; text-align: center; font-style: Regular; color: #003333;"><b>JOGADOR 2 GANHOU</b></h1>');
+				}
+				else
+				{
+					if(playerPT == 5)
+						document.write('<h1 style="font-family: Arial,Helvetica,sans-serif; text-align: center; font-style: Regular; color: #003333;"><b>VOC&Ecirc; GANHOU</b></h1>');
+					else
+						document.write('<h1 style="font-family: Arial,Helvetica,sans-serif; text-align: center; font-style: Regular; color: #003333;"><b>VOC&Ecirc; PERDEU</b></h1>');
+				}
+			} */
